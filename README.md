@@ -1,104 +1,143 @@
-# 🤖 Fleet Analytics Dashboard for Mobile Robots (AMRs)
+# 🤖 AMR Fleet Analytics Dashboard
 
-An **industrial-grade, end-to-end fleet analytics platform** for Autonomous
-Mobile Robots. It bridges physical robotics telemetry (ROS2-style pub/sub) with
-industrial data engineering (PostgreSQL + FastAPI) and operations intelligence
-(live grid monitoring, alert streams, KPIs, and Power BI integration).
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 
-Runs anywhere Docker runs — **no ROS2 installation required** — while remaining
-100% deployable as a real ROS2 node.
+An **industrial-grade, end-to-end fleet analytics platform** for Autonomous Mobile Robots (AMRs). It bridges physical robotics telemetry (ROS2-style pub/sub) with industrial data engineering (PostgreSQL + FastAPI) and operations intelligence (live grid monitoring, alert streams, KPIs, and Power BI integration).
+
+The platform is designed to run out-of-the-box using Docker (no local ROS2 installation required) while remaining 100% deployable on real physical AMRs running ROS2.
+
+> [!NOTE]
+> For in-depth technical specifications, database schemas, and implementation write-ups, check out the **[Project Wiki](WIKI.md)**.
+
+---
+
+## 📖 Table of Contents
+- [✨ Features](#-features)
+- [🏗 Architecture](#-architecture)
+- [🚀 Quick Start (Docker)](#-quick-start-docker)
+- [🧪 Verification & Operations](#-verification--operations)
+- [🛠 Local Development (Without Docker)](#-local-development-without-docker)
+- [📁 Project Structure](#-project-structure)
+- [🔌 Deploying as a Real ROS2 Node](#-deploying-as-a-real-ros2-node)
+- [📚 Repository Wiki](#-repository-wiki)
 
 ---
 
 ## ✨ Features
 
-- **Warehouse fleet simulator** — 5 distinct AMRs on a 40×40 grid with picking
-  bays, drop-off stations, charging docks and obstacle zones; realistic battery
-  discharge, auto-recharge, navigation and random diagnostics.
-- **ROS2-compatible** — publishes `/amr/telemetry`, `/amr/alerts`, `/amr/tasks`
-  and subscribes to `/amr/commands`. Uses native `rclpy` if installed, otherwise
-  an identical in-process mock bus ([simulator/mock_rclpy.py](simulator/mock_rclpy.py)).
-- **FastAPI backend** — ingestion API, fleet KPI aggregation, WebSocket live
-  streaming, and a control interface (E-Stop / dispatch).
-- **PostgreSQL** — time-series telemetry, alerts, delivery tasks, robot metadata.
-- **Premium dashboard** — a **Vite + React** SPA with a dark, glassmorphic UI:
-  canvas warehouse map, glowing KPI cards + sparklines, per-robot battery/speed
-  tiles, a live alert feed (with sound + flashing criticals), and interactive
-  E-Stop / dispatch. Built into the backend's `static/` dir and served on :8000.
-- **Power BI integration** — connect directly to PostgreSQL, plus ready-made
-  DAX measures and sample CSVs ([powerbi/readme.md](powerbi/readme.md)).
+- **Warehouse Fleet Simulator** — Simulates 5 distinct AMRs (models, battery capacity, speeds) moving on a $40 \times 40\text{m}$ grid with picking bays, drop-off stations, charging docks, and obstacle collision zones. Features realistic battery discharge, auto-recharging logic, and random fault/diagnostic generation.
+- **React Frontend Dashboard** — A premium, high-fidelity React single-page application built with Vite:
+  - **Dynamic Canvas Map**: Renders live AMR coordinates, orientation vectors, paths, charging status, and station locations. Allows interactive click-to-dispatch.
+  - **KPIs & Sparklines**: Real-time aggregate fleet metrics (availability, active count, task success rates) mapped alongside SVG trend sparklines.
+  - **Individual AMR Panels**: Battery percentages, status indicators, and operational logs.
+  - **Global Control System**: System-wide E-Stop (with red flashing screen warning) and resume actions.
+  - **Live Alert Feed**: Real-time logs for collision warnings and sensor errors, featuring sound notifications for critical events.
+- **FastAPI Backend** — High-performance ingestion REST API, fleet KPI calculations, WebSocket connection hubs (dashboard fans, simulator commands), and static asset hosting.
+- **Robust Data Storage** — PostgreSQL database logging time-series telemetry, alerts, delivery tasks, and robot metadata.
+- **ROS2 Compatible** — Communicates over topics like `/amr/telemetry`, `/amr/alerts`, and `/amr/tasks`. Uses native `rclpy` if available, falling back to an in-process mock bus if ROS2 is not installed locally.
+- **Power BI Integration** — Connection guidelines, pre-configured DAX measures, and sample datasets for building operational reports.
 
 ---
 
 ## 🏗 Architecture
 
-```
- AMR Simulator (ROS2 node / mock)
-        │  publishes telemetry, alerts, tasks
-        │  (HTTP bridge → backend)            ◀── /amr/commands (WebSocket)
-        ▼
-   FastAPI Backend ──── REST + WebSockets ────▶  Premium Web Dashboard
-        │                                              (E-Stop / dispatch)
-        ▼ stores
-   PostgreSQL  ──── SQL / DirectQuery ────▶  Power BI
+```mermaid
+graph TD
+    subgraph Simulation
+        A[AMR Simulator / ROS2 Node] <-->|WS commands / API telemetry| B(FastAPI Backend)
+    end
+
+    subgraph Data Tier
+        B <-->|SQLAlchemy / psycopg2| C[(PostgreSQL Database)]
+    end
+
+    subgraph Operations UI
+        B <-->|WebSockets & REST| D[Vite + React Dashboard]
+        C -.->|DirectQuery / CSV| E[Power BI Desktop]
+    end
+
+    style A fill:#4CAF50,stroke:#333,stroke-width:2px,color:#fff
+    style B fill:#009688,stroke:#333,stroke-width:2px,color:#fff
+    style C fill:#316192,stroke:#333,stroke-width:2px,color:#fff
+    style D fill:#61DAFB,stroke:#333,stroke-width:2px,color:#000
+    style E fill:#F2C811,stroke:#333,stroke-width:2px,color:#000
 ```
 
 ---
 
-## 🚀 Quick start (Docker)
+## 🚀 Quick Start (Docker)
+
+Spin up the entire pipeline (FastAPI backend, PostgreSQL database, simulator, and compiled React frontend) in a single command:
 
 ```bash
 docker-compose up --build
 ```
 
-Then open **http://localhost:8000**.
+Once running, the services are exposed on the following ports:
 
-| Service    | URL / Port                    | Purpose                          |
-|------------|-------------------------------|----------------------------------|
-| Dashboard  | http://localhost:8000         | Live operations UI               |
-| REST API   | http://localhost:8000/docs    | OpenAPI / Swagger explorer       |
-| PostgreSQL | localhost:5432 (fleet/fleet)  | DB for Power BI / DirectQuery     |
+| Service | Port / URL | Purpose |
+| :--- | :--- | :--- |
+| **Dashboard** | [http://localhost:8000](http://localhost:8000) | Live operations UI & Map control |
+| **REST API Docs** | [http://localhost:8000/docs](http://localhost:8000/docs) | Interactive Swagger/OpenAPI explorer |
+| **PostgreSQL** | `localhost:5432` | Time-series data repository (User/Pass: `fleet`/`fleet`) |
 
-Stop with `docker-compose down` (add `-v` to wipe the database volume).
+To shut down the stack, use:
+```bash
+docker-compose down -v
+```
+*(Add `-v` to clear the PostgreSQL database volumes if you want a clean slate).*
 
 ---
 
-## 🧪 Verification
+## 🧪 Verification & Operations
+
+### 1. Ingestion Check
+Verify the API is healthy and receiving simulated telemetry data:
 
 ```bash
-# 1. Bring the stack up
-docker-compose up --build -d
-
-# 2. Check the API
+# Check service health
 curl http://localhost:8000/healthz
-curl http://localhost:8000/api/fleet/status
-curl http://localhost:8000/api/fleet/metrics
 
-# 3. Confirm telemetry is landing in the DB
+# Fetch active fleet status snapshot
+curl http://localhost:8000/api/fleet/status
+
+# Fetch aggregate KPIs
+curl http://localhost:8000/api/fleet/metrics
+```
+
+### 2. Database Logs Check
+Confirm that telemetry packets are being persisted in PostgreSQL:
+
+```bash
 docker exec -t fleet-db psql -U fleet -d fleet -c "SELECT count(*) FROM telemetry_logs;"
 ```
 
-**Manual UI checks**
-- Robots move across the 2D grid in real time.
-- Battery bars deplete; low robots return to a dock and recharge.
-- The alert feed streams warnings/criticals (criticals flash + beep).
-- Click **GLOBAL E-STOP** → all robots halt; **RESUME ALL** → they continue.
-- Select a robot card, then click the grid to **dispatch** it to that point.
+### 3. Interactive Operations
+Open the dashboard at `http://localhost:8000` and test the controls:
+- **Interactive Dispatch**: Click on any robot card, select a target point on the 2D grid, and watch the robot recalculate and follow its path in real-time.
+- **Global E-Stop**: Click **GLOBAL E-STOP**. The dashboard will flash red, and all robots will halt immediately. Click **RESUME ALL** to restore operational states.
+- **Low Battery Auto-Docking**: Watch robots whose batteries drop below 20% abort their active missions, navigate back to a charging station, and dock until they reach 100%.
 
 ---
 
-## 🛠 Local development (without Docker)
+## 🛠 Local Development (Without Docker)
 
-**Backend**
+> [!IMPORTANT]
+> Ensure you have a local PostgreSQL instance running or start only the db service using Docker: `docker-compose up -d db`.
+
+### 1. Backend API
 ```bash
 cd backend
 pip install -r requirements.txt
-# point at a local Postgres (or run only the db service via docker-compose)
-set DATABASE_URL=postgresql+psycopg2://fleet:fleet@localhost:5432/fleet   # Windows
+set DATABASE_URL=postgresql+psycopg2://fleet:fleet@localhost:5432/fleet
 uvicorn main:app --reload --port 8000
 ```
 
-**Simulator**
+### 2. Robot Simulator
 ```bash
 cd simulator
 pip install -r requirements.txt
@@ -107,50 +146,71 @@ set WS_URL=ws://localhost:8000/ws/simulator
 python robot_simulator.py
 ```
 
-**Frontend (Vite + React)**
+### 3. React Frontend
 ```bash
 cd frontend
 npm install
-npm run dev      # http://localhost:5173 — proxies /api + /ws to :8000
+npm run dev      # Runs on http://localhost:5173 (proxies API & WS requests to 8000)
 ```
-The dev server proxies REST and WebSocket traffic to the backend on :8000, so
-run the backend (above) alongside it.
 
-To produce the production bundle the backend serves at :8000:
+To build the frontend static assets for production deployment served by FastAPI:
 ```bash
 cd frontend
-npm run build    # outputs to ../backend/static (served at / and /static)
+npm run build    # Outputs to ../backend/static/
 ```
-(The Docker image runs this build automatically — see `backend/Dockerfile`.)
 
 ---
 
-## 📁 Project structure
+## 📁 Project Structure
 
-```
+```text
 robotics/
-├─ docker-compose.yml          # 3-service orchestration
-├─ backend/                    # FastAPI + DB layer (+ serves built dashboard)
-│  ├─ main.py                  # API, WebSockets, control, static hosting
-│  ├─ database.py models.py schemas.py
-│  ├─ requirements.txt  Dockerfile  # Dockerfile also builds the frontend
-│  └─ static/                  # generated Vite build (git-ignored)
-├─ frontend/                   # Vite + React dashboard (source)
-│  ├─ index.html  vite.config.js  package.json
-│  └─ src/                     # App.jsx, useFleet.js, components/, …
-├─ simulator/                  # Warehouse fleet simulator
-│  ├─ robot_simulator.py       # physics, navigation, battery, alerts
-│  ├─ mock_rclpy.py            # ROS2 fallback (rclpy-compatible)
-│  ├─ requirements.txt  Dockerfile
-└─ powerbi/                    # BI guide + sample CSVs
-   └─ readme.md, sample_*.csv
+├── docker-compose.yml          # Container orchestration (DB, backend, simulator)
+├── README.md                   # Repository landing page
+├── WIKI.md                     # Wiki hub
+├── wiki/                       # Detailed wiki documentation pages
+│   ├── Architecture.md         # Architecture, ROS2, and mock message bus
+│   ├── Frontend.md             # React structures, canvas map, and state hooks
+│   ├── Backend.md              # FastAPI, routes, websockets, and schema
+│   ├── Simulator.md            # AMR physical simulation details and pathing
+│   └── PowerBI.md              # Connecting DB, DAX equations, and report setups
+├── backend/                    # FastAPI Server & DB Layer
+│   ├── main.py                 # Core routing, WebSocket managers, static routes
+│   ├── database.py             # DB connection pool initialization
+│   ├── models.py               # SQLAlchemy schemas (Postgres)
+│   ├── schemas.py              # Pydantic schemas (REST/WS validations)
+│   └── static/                 # Directory serving compiled React code
+├── frontend/                   # React + Vite Client code
+│   ├── package.json            # NPM dependencies
+│   ├── src/                    # Components & State hooks
+│   │   ├── useFleet.js         # Custom hook managing WebSockets & telemetry
+│   │   └── components/         # AlertFeed, BatteryChart, WarehouseMap, etc.
+│   └── vite.config.js          # Dev proxy configs
+├── simulator/                  # Python AMR Fleet Simulator
+│   ├── robot_simulator.py      # Simulation loop, physics, battery, paths
+│   └── mock_rclpy.py           # Fallback ROS2 mock node interface
+└── powerbi/                    # BI Reports
+    ├── readme.md               # Guide to connecting Power BI to PostgreSQL
+    └── sample_robots.csv       # Preloaded datasets for offline report building
 ```
 
 ---
 
-## 🔌 Deploying as a real ROS2 node
+## 🔌 Deploying as a Real ROS2 Node
 
-`robot_simulator.py` is written against the standard `rclpy` API. On a machine
-with ROS2 (e.g. Humble) installed, `import rclpy` succeeds and the node runs as a
-genuine ROS2 participant — the same publishers/subscriptions, no code changes.
-Without ROS2, it transparently falls back to `mock_rclpy`.
+The simulator code is natively written using the `rclpy` interface. When run on a machine containing a ROS2 environment (such as ROS2 Humble):
+1. The script will automatically detect `rclpy`.
+2. It will bypass the local mock bus and publish real messages on the `/amr/telemetry`, `/amr/alerts`, and `/amr/tasks` ROS2 topics.
+3. Subscriptions to control topics like `/amr/commands` will interact with standard ROS2 nodes in your workspace.
+
+---
+
+## 📚 Repository Wiki
+
+For detailed guides and deep dives into individual components, refer to our sub-pages:
+- **[Wiki Index](WIKI.md)** — Hub for all wiki entries.
+- **[System Architecture](wiki/Architecture.md)** — Data model, protocols, and ROS2 bridging.
+- **[React Frontend Docs](wiki/Frontend.md)** — Canvas layout, WebSockets, and state.
+- **[FastAPI Backend Specs](wiki/Backend.md)** — API endpoints, WebSockets, and DB setup.
+- **[AMR Simulator Logic](wiki/Simulator.md)** — Movement physics, battery charts, and navigation paths.
+- **[Power BI Integration Guide](wiki/PowerBI.md)** — Relational tables, DAX measures, and CSV schemas.
