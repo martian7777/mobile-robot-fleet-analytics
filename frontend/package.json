@@ -1,0 +1,22 @@
+{
+  "name": "fleet-dashboard-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Vite + React frontend for the AMR Fleet Analytics Dashboard",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.7",
+    "react": "^18.3.1",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.7"
+  }
+}
