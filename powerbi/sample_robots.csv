@@ -1,0 +1,6 @@
+id,model,max_speed,battery_capacity,status,battery_level,pos_x,pos_y,orientation,current_task,total_distance,updated_at
+Atlas-1,Atlas-HD,1.6,1200,moving,72.4,18.3,22.1,0.7853,Pick @ Bay (34, 14),842.6,2026-06-06 14:31:02
+Atlas-2,Atlas-HD,1.6,1200,charging,18.9,2.0,8.0,0.0,Charging Dock (2, 8),915.2,2026-06-06 14:31:02
+Titan-1,Titan-XL,1.2,2000,moving,64.1,26.7,30.4,1.5707,Drop @ Station (24, 34),623.9,2026-06-06 14:31:02
+Titan-2,Titan-XL,1.2,2000,estopped,55.3,12.0,12.0,2.3561,Pick @ Bay (34, 22),701.4,2026-06-06 14:31:02
+Swift-1,Swift-Lite,2.2,800,moving,41.8,30.1,6.5,-0.7853,Drop @ Station (32, 34),1180.7,2026-06-06 14:31:02

@@ -1,0 +1,10 @@
+id,robot_id,target_station,target_x,target_y,start_time,end_time,status,success
+1,Atlas-1,Pick @ Bay (34, 6),34,6,2026-06-06 14:05:00,2026-06-06 14:08:22,completed,true
+2,Atlas-1,Drop @ Station (16, 34),16,34,2026-06-06 14:08:25,2026-06-06 14:12:10,completed,true
+3,Atlas-2,Pick @ Bay (34, 14),34,14,2026-06-06 14:06:11,2026-06-06 14:10:02,completed,true
+4,Atlas-2,Charging Dock (2, 8),2,8,2026-06-06 14:24:00,,in_progress,false
+5,Titan-1,Pick @ Bay (34, 22),34,22,2026-06-06 14:09:40,2026-06-06 14:15:31,completed,true
+6,Titan-1,Drop @ Station (24, 34),24,34,2026-06-06 14:15:35,,in_progress,false
+7,Titan-2,Pick @ Bay (34, 22),34,22,2026-06-06 14:18:00,2026-06-06 14:22:49,failed,false
+8,Swift-1,Pick @ Bay (34, 36),34,36,2026-06-06 14:11:20,2026-06-06 14:13:55,completed,true
+9,Swift-1,Drop @ Station (32, 34),32,34,2026-06-06 14:14:00,,in_progress,false

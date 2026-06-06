@@ -1,0 +1,8 @@
+id,robot_id,timestamp,severity,code,message,acknowledged
+1,Atlas-1,2026-06-06 14:12:31,warning,LIDAR_OBSCURED,Atlas-1: Lidar partially obscured - reduced perception,true
+2,Swift-1,2026-06-06 14:18:05,warning,HIGH_MOTOR_TEMP,Swift-1: Drive motor temperature elevated,true
+3,Titan-2,2026-06-06 14:22:49,critical,OBSTACLE_COLLISION,Titan-2: Imminent obstacle - emergency avoidance engaged,false
+4,Atlas-2,2026-06-06 14:25:10,critical,BATTERY_CRITICAL,Atlas-2 battery at 19% - returning to dock,false
+5,Titan-1,2026-06-06 14:27:33,warning,WHEEL_SLIP,Titan-1: Wheel slippage detected on floor segment,false
+6,Swift-1,2026-06-06 14:29:01,warning,PAYLOAD_SHIFT,Swift-1: Payload center-of-mass shift detected,false
+7,Titan-2,2026-06-06 14:30:15,critical,LIDAR_FAILURE,Titan-2: Lidar sensor failure - navigation degraded,false
