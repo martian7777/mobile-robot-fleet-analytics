@@ -1,5 +1,20 @@
 # syntax=docker/dockerfile:1
-# ---- Stage 1: build deps into a wheelhouse (cache-friendly) ----------------
+# NOTE: this Dockerfile expects the *repository root* as its build context
+# (see docker-compose.yml) so it can build the Vite + React frontend alongside
+# the FastAPI backend.
+
+# ---- Stage 0: build the Vite + React dashboard -----------------------------
+# vite.config.js emits the production bundle into ../backend/static, so building
+# from /app/frontend lands the assets at /app/backend/static.
+FROM node:20-slim AS frontend
+
+WORKDIR /app/frontend
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+COPY frontend/ ./
+RUN npm run build
+
+# ---- Stage 1: build python deps into a wheelhouse (cache-friendly) ----------
 FROM python:3.12-slim AS builder
 
 WORKDIR /build
@@ -7,7 +22,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip wheel --no-cache-dir --wheel-dir /wheels -r requirements.txt
 
 # ---- Stage 2: lean runtime -------------------------------------------------
@@ -23,12 +38,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends libpq5 curl \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /wheels /wheels
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir --no-index --find-links=/wheels -r requirements.txt \
     && rm -rf /wheels
 
 # Application code (flat module layout: `import main`, `import models`, ...).
-COPY . .
+COPY backend/ .
+
+# Built dashboard from the frontend stage (served at / and /static).
+COPY --from=frontend /app/backend/static ./static
 
 EXPOSE 8000
 

@@ -21,9 +21,10 @@ Runs anywhere Docker runs — **no ROS2 installation required** — while remain
 - **FastAPI backend** — ingestion API, fleet KPI aggregation, WebSocket live
   streaming, and a control interface (E-Stop / dispatch).
 - **PostgreSQL** — time-series telemetry, alerts, delivery tasks, robot metadata.
-- **Premium dashboard** — dark, glassmorphic UI with a canvas warehouse map,
-  glowing KPI cards + sparklines, per-robot battery/speed tiles, a live alert
-  feed (with sound + flashing criticals), and interactive E-Stop / dispatch.
+- **Premium dashboard** — a **Vite + React** SPA with a dark, glassmorphic UI:
+  canvas warehouse map, glowing KPI cards + sparklines, per-robot battery/speed
+  tiles, a live alert feed (with sound + flashing criticals), and interactive
+  E-Stop / dispatch. Built into the backend's `static/` dir and served on :8000.
 - **Power BI integration** — connect directly to PostgreSQL, plus ready-made
   DAX measures and sample CSVs ([powerbi/readme.md](powerbi/readme.md)).
 
@@ -106,6 +107,22 @@ set WS_URL=ws://localhost:8000/ws/simulator
 python robot_simulator.py
 ```
 
+**Frontend (Vite + React)**
+```bash
+cd frontend
+npm install
+npm run dev      # http://localhost:5173 — proxies /api + /ws to :8000
+```
+The dev server proxies REST and WebSocket traffic to the backend on :8000, so
+run the backend (above) alongside it.
+
+To produce the production bundle the backend serves at :8000:
+```bash
+cd frontend
+npm run build    # outputs to ../backend/static (served at / and /static)
+```
+(The Docker image runs this build automatically — see `backend/Dockerfile`.)
+
 ---
 
 ## 📁 Project structure
@@ -113,11 +130,14 @@ python robot_simulator.py
 ```
 robotics/
 ├─ docker-compose.yml          # 3-service orchestration
-├─ backend/                    # FastAPI + dashboard + DB layer
+├─ backend/                    # FastAPI + DB layer (+ serves built dashboard)
 │  ├─ main.py                  # API, WebSockets, control, static hosting
 │  ├─ database.py models.py schemas.py
-│  ├─ requirements.txt  Dockerfile
-│  └─ static/                  # index.html · css/styles.css · js/app.js
+│  ├─ requirements.txt  Dockerfile  # Dockerfile also builds the frontend
+│  └─ static/                  # generated Vite build (git-ignored)
+├─ frontend/                   # Vite + React dashboard (source)
+│  ├─ index.html  vite.config.js  package.json
+│  └─ src/                     # App.jsx, useFleet.js, components/, …
 ├─ simulator/                  # Warehouse fleet simulator
 │  ├─ robot_simulator.py       # physics, navigation, battery, alerts
 │  ├─ mock_rclpy.py            # ROS2 fallback (rclpy-compatible)

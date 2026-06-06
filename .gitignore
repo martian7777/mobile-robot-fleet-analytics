@@ -15,5 +15,14 @@ Thumbs.db
 # Docker / runtime
 *.log
 
+# Node (frontend)
+node_modules/
+frontend/dist/
+.vite/
+
+# Generated frontend build — produced by `vite build` (frontend/) or the
+# Docker frontend stage; not committed.
+backend/static/
+
 # Power BI working files
 *.pbix

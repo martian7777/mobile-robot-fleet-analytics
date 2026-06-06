@@ -1,0 +1,22 @@
+# Node
+frontend/node_modules
+frontend/dist
+frontend/.vite
+
+# Generated frontend build (produced inside the image by the frontend stage)
+backend/static
+
+# Python
+**/__pycache__
+**/*.pyc
+.venv
+venv
+
+# Git / editor
+.git
+.gitignore
+.vscode
+.idea
+
+# Power BI working files
+*.pbix
