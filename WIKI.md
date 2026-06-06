@@ -2,6 +2,8 @@
 
 Welcome to the technical developer documentation wiki for the **Autonomous Mobile Robot (AMR) Fleet Analytics Platform**. This workspace serves as a deep dive into the engineering, architecture, protocols, and data schemas that power the fleet dashboard, simulators, database layer, and BI reporting tools.
 
+![AMR Fleet Analytics Live Operations Dashboard](dashboard_screenshot.png)
+
 ---
 
 ## 🧭 Wiki Table of Contents

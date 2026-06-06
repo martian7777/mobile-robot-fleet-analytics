@@ -10,6 +10,8 @@ An **industrial-grade, end-to-end fleet analytics platform** for Autonomous Mobi
 
 The platform is designed to run out-of-the-box using Docker (no local ROS2 installation required) while remaining 100% deployable on real physical AMRs running ROS2.
 
+![AMR Fleet Analytics Live Operations Dashboard](dashboard_screenshot.png)
+
 > [!NOTE]
 > For in-depth technical specifications, database schemas, and implementation write-ups, check out the **[Project Wiki](WIKI.md)**.
 

@@ -2,6 +2,8 @@
 
 This page outlines the client-side single-page application (SPA), documenting component structures, state sync mechanics, and the coordinate mapping systems of the warehouse map.
 
+![AMR Fleet Analytics Live Operations Dashboard](dashboard_screenshot.png)
+
 ---
 
 ## 🛠 1. Technology Stack & Design System
